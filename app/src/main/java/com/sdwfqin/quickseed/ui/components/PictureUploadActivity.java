@@ -3,15 +3,15 @@ package com.sdwfqin.quickseed.ui.components;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.sdwfqin.quickseed.base.ArouterConstants;
 import com.sdwfqin.quickseed.base.SampleBaseActivity;
 import com.sdwfqin.quickseed.databinding.ActivityPictureUploadBinding;
 import com.sdwfqin.quickseed.model.PictureModel;
 import com.sdwfqin.quickseed.utils.picture.PictureSelectUtils;
 import com.sdwfqin.widget.pictureupload.PictureUploadCallback;
-import com.sdwfqin.widget.pictureupload.PictureUploadView;
 import com.zhihu.matisse.Matisse;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +21,7 @@ import java.util.List;
  * @author zhangqin
  * @date 2018/5/31
  */
+@Route(path = ArouterConstants.COMPONENTS_PICTUREUPLOAD)
 public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUploadBinding> {
 
     public static final int RESULT_PHOTO_SELECT = 101;
@@ -71,7 +72,7 @@ public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUpl
             switch (requestCode) {
                 case RESULT_PHOTO_SELECT:
                     List<PictureModel> models = new ArrayList<>();
-                    List<String> selectList = Matisse.obtainPathResult(data);
+                    List<Uri> selectList = Matisse.obtainResult(data);
                     for (int i = 0; i < selectList.size(); i++) {
                         models.add(new PictureModel(selectList.get(i)));
                     }
@@ -79,8 +80,7 @@ public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUpl
 
                     // 刷新相册图片
                     if (selectList.size() == 1) {
-                        String saveAs = selectList.get(0);
-                        Uri contentUri = Uri.fromFile(new File(saveAs));
+                        Uri contentUri = selectList.get(0);
                         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, contentUri);
                         sendBroadcast(mediaScanIntent);
                     }

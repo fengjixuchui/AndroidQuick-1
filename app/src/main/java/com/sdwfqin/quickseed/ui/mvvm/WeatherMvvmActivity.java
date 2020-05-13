@@ -1,6 +1,11 @@
 package com.sdwfqin.quickseed.ui.mvvm;
 
-import com.sdwfqin.quicklib.mvvm.BaseMvvmActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.blankj.utilcode.util.LogUtils;
+import com.sdwfqin.quickseed.base.ArouterConstants;
+import com.sdwfqin.quickseed.base.SampleBaseMvvmActivity;
 import com.sdwfqin.quickseed.databinding.ActivityWeatherMvvmBinding;
 
 /**
@@ -10,7 +15,8 @@ import com.sdwfqin.quickseed.databinding.ActivityWeatherMvvmBinding;
  * @author 张钦
  * @date 2020/4/14
  */
-public class WeatherMvvmActivity extends BaseMvvmActivity<ActivityWeatherMvvmBinding, WeatherViewModel> {
+@Route(path = ArouterConstants.COMPONENTS_MVVM)
+public class WeatherMvvmActivity extends SampleBaseMvvmActivity<ActivityWeatherMvvmBinding, WeatherViewModel> {
 
     @Override
     protected ActivityWeatherMvvmBinding getViewBinding() {
@@ -18,8 +24,8 @@ public class WeatherMvvmActivity extends BaseMvvmActivity<ActivityWeatherMvvmBin
     }
 
     @Override
-    protected Class<WeatherViewModel> getViewModel() {
-        return WeatherViewModel.class;
+    protected WeatherViewModel getViewModel() {
+        return new ViewModelProvider(this).get(WeatherViewModel.class);
     }
 
     @Override
@@ -28,17 +34,17 @@ public class WeatherMvvmActivity extends BaseMvvmActivity<ActivityWeatherMvvmBin
         mTopBar.addLeftBackImageButton().setOnClickListener(v -> finish());
 
         mBinding.setViewModel(mVm);
+        mBinding.setHandlers(new WeatherMvvmHandlers());
         mBinding.setLifecycleOwner(this);
 
-        mVm.loadWeather();
-    }
+        mVm.birthDate.observe(this, LogUtils::e);
 
-    @Override
-    protected void initClickListener() {
+        mVm.loadWeather();
     }
 
     @Override
     protected void commonNetworkErrorListener(Throwable throwable) {
         showMsg(throwable.getMessage());
     }
+
 }

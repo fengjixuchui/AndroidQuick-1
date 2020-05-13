@@ -5,24 +5,41 @@
 
     <data>
 
+        <import type="com.sdwfqin.quickseed.ui.mvvm.WeatherMvvmConverter" />
+
         <variable
             name="viewModel"
             type="com.sdwfqin.quickseed.ui.mvvm.WeatherViewModel" />
+
+        <variable
+            name="handlers"
+            type="com.sdwfqin.quickseed.ui.mvvm.WeatherMvvmHandlers" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:qmui_skin_background="?attr/app_content_bg_color"
         tools:context=".ui.mvvm.WeatherMvvmActivity">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:text="@{viewModel.weatherBean.toString()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:qmui_skin_text_color="?attr/app_text_black_color" />
+
+        <EditText
+            android:id="@+id/birth_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@={WeatherMvvmConverter.dateToString(birthDate, viewModel.birthDate)}"
+            app:layout_constraintBottom_toTopOf="@+id/btn_refresh"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
         <Button
             android:id="@+id/btn_refresh"
@@ -30,9 +47,20 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:onClick="@{() -> viewModel.loadWeather()}"
-            android:text="刷新"
+            android:text="刷新内容"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/btn_test" />
+
+        <Button
+            android:id="@+id/btn_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:onClick="@{handlers::onClickTest}"
+            android:text="点击测试"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/btn_refresh"
             app:layout_constraintRight_toRightOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

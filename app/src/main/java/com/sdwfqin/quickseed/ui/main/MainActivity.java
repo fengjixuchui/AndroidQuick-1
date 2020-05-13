@@ -4,16 +4,19 @@ import android.Manifest;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewbinding.ViewBinding;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.blankj.utilcode.util.ConvertUtils;
 import com.qmuiteam.qmui.widget.tab.QMUITab;
 import com.qmuiteam.qmui.widget.tab.QMUITabBuilder;
 import com.sdwfqin.quickseed.R;
+import com.sdwfqin.quickseed.base.ArouterConstants;
 import com.sdwfqin.quickseed.base.SampleBaseActivity;
 import com.sdwfqin.quickseed.databinding.ActivityMainBinding;
 
@@ -57,13 +60,16 @@ public class MainActivity extends SampleBaseActivity<ActivityMainBinding> {
 
     private void initPagers() {
         mPages = new ArrayList<>(2);
-        mPages.add(new MainFragment());
-        mPages.add(new SettingFragment());
+        mPages.add((Fragment) ARouter.getInstance().build(ArouterConstants.MAIN_HOME).navigation());
+        mPages.add((Fragment) ARouter.getInstance().build(ArouterConstants.MAIN_MINE).navigation());
 
-        mTabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), mPages);
+        mTabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager(), getLifecycle(), mPages);
 
         mBinding.pager.setOffscreenPageLimit(2);
         mBinding.pager.setAdapter(mTabPagerAdapter);
+
+        // 禁止ViewPager2的滑动
+        mBinding.pager.setUserInputEnabled(false);
     }
 
     private void initTabs() {
@@ -85,7 +91,7 @@ public class MainActivity extends SampleBaseActivity<ActivityMainBinding> {
         mBinding.tabs.addTab(component)
                 .addTab(util);
 
-        mBinding.tabs.setupWithViewPager(mBinding.pager, false);
+        mBinding.tabs.setupWithViewPager(mBinding.pager);
     }
 
     /**
@@ -108,22 +114,23 @@ public class MainActivity extends SampleBaseActivity<ActivityMainBinding> {
         });
     }
 
-    private class TabPagerAdapter extends FragmentPagerAdapter {
+    private class TabPagerAdapter extends FragmentStateAdapter {
 
         private List<Fragment> pagers;
 
-        public TabPagerAdapter(FragmentManager fm, List<Fragment> pagers) {
-            super(fm);
+        public TabPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle, List<Fragment> pagers) {
+            super(fragmentManager, lifecycle);
             this.pagers = pagers;
         }
 
+        @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             return pagers.get(position);
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return pagers.size();
         }
     }
