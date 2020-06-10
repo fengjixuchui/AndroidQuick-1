@@ -33,7 +33,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <!-- FileProvider文件共享 -->
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -79,10 +78,24 @@
         <activity
             android:name=".ui.components.ShowSvgActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
-        <activity android:name=".ui.components.WindowFloatAndScreenshotActivity" />
-        <activity android:name=".ui.mvvm.WeatherMvvmActivity" />
-        <activity android:name=".ui.mvp.WeatherMvpActivity" />
-        <activity android:name=".ui.components.CircleProgressDemoActivity" />
+        <activity
+            android:name=".ui.components.WebViewMainActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".ui.components.WindowFloatAndScreenshotActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".ui.mvvm.WeatherMvvmActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".ui.mvp.WeatherMvpActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".ui.components.CircleProgressDemoActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name=".ui.example.sortlist.SortListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity
             android:name=".wxapi.WXPayEntryActivity"
             android:exported="true"

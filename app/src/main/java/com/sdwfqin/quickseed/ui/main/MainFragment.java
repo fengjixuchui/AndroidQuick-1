@@ -1,5 +1,6 @@
 package com.sdwfqin.quickseed.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -13,10 +14,10 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.sdwfqin.quicklib.base.BaseFragment;
 import com.sdwfqin.quicklib.dialog.HintDialog;
 import com.sdwfqin.quicklib.imagepreview.ImagePreviewActivity;
-import com.sdwfqin.quicklib.webview.WebViewActivity;
 import com.sdwfqin.quickseed.R;
 import com.sdwfqin.quickseed.base.ArouterConstants;
 import com.sdwfqin.quickseed.databinding.FragmentMainBinding;
+import com.sdwfqin.quickseed.ui.example.sortlist.SortListActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,14 +37,14 @@ public class MainFragment extends BaseFragment<FragmentMainBinding> {
             "跑马灯Demo",
             "Camerax（支持二维码识别）",
             "VLayoutDemo",
-            "展示SVG图片",
-            "跳转网页",
-            "自定义Webview",
+            "展示原生SVG图片",
+            "WebView",
             "悬浮窗与截图",
-            "弹窗",
+            "支持换肤的弹窗",
             "Mvvm Demo",
             "Mvp Demo",
             "圆（方）形加载进度条",
+            "仿京东分类列表",
     };
 
     @Override
@@ -88,15 +89,12 @@ public class MainFragment extends BaseFragment<FragmentMainBinding> {
                     ARouter.getInstance().build(ArouterConstants.COMPONENTS_SHOWSVG).navigation();
                     break;
                 case 7:
-                    WebViewActivity.launch("https://www.baidu.com");
+                    ARouter.getInstance().build(ArouterConstants.COMPONENTS_WEBVIEW).navigation();
                     break;
                 case 8:
-                    ARouter.getInstance().build(ArouterConstants.COMPONENTS_CUSTOMWEBVIEW).navigation();
-                    break;
-                case 9:
                     ARouter.getInstance().build(ArouterConstants.COMPONENTS_WINDOWFLOATANDSCREENSHOT).navigation();
                     break;
-                case 10:
+                case 9:
                     HintDialog hintDialog = new HintDialog(mContext);
                     hintDialog.setFollowSkin(true);
                     hintDialog.show();
@@ -115,14 +113,17 @@ public class MainFragment extends BaseFragment<FragmentMainBinding> {
                         }
                     });
                     break;
-                case 11:
+                case 10:
                     ARouter.getInstance().build(ArouterConstants.COMPONENTS_MVVM).navigation();
                     break;
-                case 12:
+                case 11:
                     ARouter.getInstance().build(ArouterConstants.COMPONENTS_MVP).navigation();
                     break;
-                case 13:
+                case 12:
                     ARouter.getInstance().build(ArouterConstants.COMPONENTS_CIRCLEPROGRESSDEMO).navigation();
+                    break;
+                case 13:
+                    startActivity(new Intent(mContext, SortListActivity.class));
                     break;
                 default:
             }

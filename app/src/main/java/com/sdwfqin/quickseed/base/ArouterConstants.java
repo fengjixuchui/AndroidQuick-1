@@ -44,11 +44,6 @@ public class ArouterConstants {
     public static final String COMPONENTS_SHOWSVG = "/components/showsvg";
 
     /**
-     * 自定义WebView
-     */
-    public static final String COMPONENTS_CUSTOMWEBVIEW = "/components/customwebview";
-
-    /**
      * 悬浮窗与截图
      */
     public static final String COMPONENTS_WINDOWFLOATANDSCREENSHOT = "/components/WINDOWFLOATANDSCREENSHOT";
@@ -68,4 +63,13 @@ public class ArouterConstants {
      */
     public static final String COMPONENTS_CIRCLEPROGRESSDEMO = "/components/circleprogressdemo";
 
+    /**
+     * WebViewDemo
+     */
+    public static final String COMPONENTS_WEBVIEW = "/components/webview";
+
+    /**
+     * 自定义WebView
+     */
+    public static final String COMPONENTS_CUSTOMWEBVIEW = "/components/customwebview";
 }

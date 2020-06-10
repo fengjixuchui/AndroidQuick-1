@@ -22,8 +22,8 @@
     
 > 开发环境
 
-    AndroidStudio 3.6+
-    Gradle 5.6.4
+    AndroidStudio 4+
+    Gradle 6.1.1
 
 ## 必读事项
 
@@ -64,6 +64,15 @@
     ARouter.init(this);
     Utils.init(this);
     ```
+   
+8. Base中封装了`viewBinding`/`dataBinding`相关代码，需在项目的`build.gradle`中启用`viewBinding`/`dataBinding`，两者可选其一，也可一起混合使用（非`dataBinding`页面使用`viewBinding`代替`findViewById`或`Butterknife`），请参考[Sample](/app)中的相关代码，请不要使用`setContentView`添加布局，应通过实现Base中的`getViewBinding`方法添加布局。
+
+    ``` groovy
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
+    ```
 
 ## 关于支付模块支付宝支付的特殊说明
 
@@ -97,13 +106,11 @@
 # 导入指南
 
 ``` groovy
-// 测试版
-
-def quicklib = "4.0.0-alpha09"
+def quicklib = "4.1.0"
 
 // quicklib(Base)
 implementation "com.sdwfqin.quicklib:quicklib:$quicklib"
-annotationProcessor "com.qmuiteam:arch-compiler:2.0.0-alpha08"
+annotationProcessor "com.qmuiteam:arch-compiler:2.0.0-alpha10"
 annotationProcessor "com.alibaba:arouter-compiler:1.2.2"
 // 支付模块
 implementation "com.sdwfqin.quicklib:paylib:$quicklib"
@@ -111,22 +118,6 @@ implementation "com.sdwfqin.quicklib:paylib:$quicklib"
 implementation "com.sdwfqin.quicklib:imageloader:$quicklib"
 // Android 自定义View组件
 implementation "com.sdwfqin.quicklib:widget:$quicklib"
-
-// =================================================
-
-// 稳定版
-
-// quicklib(Base)
-implementation 'com.sdwfqin.quicklib:quicklib:3.3.0'
-
-// 支付模块
-implementation 'com.sdwfqin.quicklib:paylib:3.1.0'
-
-// Android 图片加载库（Glide封装）
-implementation 'com.sdwfqin.quick:imageloader:3.2.0'
-
-// Android 自定义View组件
-implementation 'com.sdwfqin.quick:widget:3.2.0'
 ```
 
 # 相关文档
@@ -154,15 +145,16 @@ implementation 'com.sdwfqin.quick:widget:3.2.0'
 | BaseActivity |  |
 | BaseFragment |  |
 | BaseMvpActivity | 支持MVP的基类Activity |
-| BaseMvpFragment | 支持MVC的基类Fragment |
+| BaseMvpFragment | 支持MVP的基类Fragment |
 | RxPresenter | Presenter层封装 |
 | BaseMvvmActivity | 支持MVVM的基类Activity |
+| BaseMvvmFragment | 支持MVVM的基类Fragment |
 | BaseViewModel | ViewModel基类 |
 | WechatShareTools | 微信分享工具类 |
 | ImagePreviewActivity | 图片预览Activity（多图/单图） |
-| BaseWebView | ViewActivity基类 |
-| WebViewActivity | 传入url即可 |
-| WebViewLoadDataActivity | 针对非url链接的网页 |
+| QuickBaseWebViewActivity | ViewActivity基类 |
+| QuickWebViewActivity | 传入url即可 |
+| QuickWebViewLoadDataActivity | 针对非url链接的网页 |
 | GsonUtil | Gson工具类 |
 | RxSchedulersUtils | compose()统一线程处理 |
 | RxTimerUtil | RxJava定时任务 |

@@ -21,8 +21,8 @@ import com.sdwfqin.quicklib.utils.eventbus.EventBusUtil;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * 描述：Fragment基类
@@ -92,6 +92,7 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment imple
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mInflater = onGetLayoutInflater(savedInstanceState);
         initPresenter();
+        initViewModel();
         initEventAndData();
         initClickListener();
         // 界面加载完成
@@ -117,6 +118,8 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment imple
 
     /**
      * 懒加载条件判断
+     * <p>
+     * 请查看当前类{@link #setUserVisibleHint}相关注释
      */
     @Deprecated
     private void baseLazyLoad() {
@@ -270,6 +273,10 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment imple
         }
     }
 
+    protected void initViewModel() {
+
+    }
+
     protected void initPresenter() {
 
     }
@@ -291,12 +298,16 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment imple
     /**
      * 点击事件
      */
-    protected abstract void initClickListener();
+    protected void initClickListener() {
+
+    }
 
     /**
      * 页面懒加载
      * <p>
      * ViewPager2已经可以实现原生懒加载
+     * <p>
+     * 请查看当前类{@link #setUserVisibleHint}相关注释
      */
     @Deprecated
     protected void lazyLoadShow() {
@@ -307,6 +318,8 @@ public abstract class BaseFragment<V extends ViewBinding> extends Fragment imple
      * 页面懒加载
      * <p>
      * ViewPager2已经可以实现原生懒加载
+     * <p>
+     * 请查看当前类{@link #setUserVisibleHint}相关注释
      */
     @Deprecated
     protected void lazyLoadHide() {
