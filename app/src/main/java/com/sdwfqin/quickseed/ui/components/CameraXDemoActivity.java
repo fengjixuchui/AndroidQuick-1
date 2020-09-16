@@ -26,7 +26,6 @@ import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.MeteringPoint;
 import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
-import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
 import androidx.camera.core.ZoomState;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -47,17 +46,18 @@ import com.google.zxing.common.HybridBinarizer;
 import com.sdwfqin.imageloader.ImageLoader;
 import com.sdwfqin.quicklib.base.BaseActivity;
 import com.sdwfqin.quickseed.R;
-import com.sdwfqin.quickseed.base.ArouterConstants;
-import com.sdwfqin.quickseed.base.Constants;
+import com.sdwfqin.quickseed.constants.ArouterConstants;
 import com.sdwfqin.quickseed.databinding.ActivityCameraxDemoBinding;
-import com.sdwfqin.quickseed.utils.qrbarscan.QrBarTool;
-import com.sdwfqin.quickseed.view.CameraXCustomPreviewView;
 
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+
+import io.github.sdwfqin.samplecommonlibrary.base.Constants;
+import io.github.sdwfqin.samplecommonlibrary.utils.qrbarscan.DecodeCodeTools;
+import io.github.sdwfqin.samplecommonlibrary.view.CameraXCustomPreviewView;
 
 /**
  * CameraX Demo
@@ -69,6 +69,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Route(path = ArouterConstants.COMPONENTS_CAMERAX)
 public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding> implements CameraXConfig.Provider {
+
+    private static final int CHANGE_TYPE_RATIO = 0;
+    private static final int CHANGE_TYPE_SELECTOR = 1;
 
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture mImageCapture;
@@ -90,6 +93,7 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
      */
     private boolean mIsNextAnalysis = true;
     private String mQrText = "";
+    private ProcessCameraProvider mCameraProvider;
 
     @Override
     protected ActivityCameraxDemoBinding getViewBinding() {
@@ -100,6 +104,8 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
     protected void initEventAndData() {
 
         mTopBar.setVisibility(View.GONE);
+
+        executor = ContextCompat.getMainExecutor(this);
 
         initCamera();
     }
@@ -156,7 +162,7 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
                     break;
             }
 
-            initCamera();
+            changeCameraConfig(CHANGE_TYPE_RATIO);
         });
 
         /**
@@ -173,7 +179,7 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
                     mBinding.btnCameraSelector.setText("前");
                     break;
             }
-            initCamera();
+            changeCameraConfig(CHANGE_TYPE_SELECTOR);
         });
 
         /**
@@ -192,18 +198,22 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
 
     private void initCamera() {
 
-        executor = ContextCompat.getMainExecutor(this);
-
         cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
         initUseCases();
 
         cameraProviderFuture.addListener(() -> {
             try {
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-                cameraProvider.unbindAll();
-                bindPreview(cameraProvider);
+                mCameraProvider = cameraProviderFuture.get();
+                mCameraProvider.unbindAll();
+                mPreview.setSurfaceProvider(mBinding.viewFinder.createSurfaceProvider());
+                Camera camera = mCameraProvider.bindToLifecycle(this, mCameraSelector, mPreview, mImageCapture, mImageAnalysis);
+                mCameraInfo = camera.getCameraInfo();
+                mCameraControl = camera.getCameraControl();
+
+                initCameraListener();
             } catch (ExecutionException | InterruptedException e) {
+                LogUtils.e(e);
                 // No errors need to be handled for this Future.
                 // This should never be reached.
             }
@@ -211,46 +221,21 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
 
     }
 
-    private void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
-
-        mPreview.setSurfaceProvider(mBinding.viewFinder.createSurfaceProvider());
-        Camera camera = cameraProvider.bindToLifecycle(this, mCameraSelector, mImageCapture, mImageAnalysis, mPreview);
-
-        mCameraInfo = camera.getCameraInfo();
-        mCameraControl = camera.getCameraControl();
-
-        initCameraListener();
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     private void initCameraListener() {
         LiveData<ZoomState> zoomState = mCameraInfo.getZoomState();
-        float maxZoomRatio = zoomState.getValue().getMaxZoomRatio();
-        float minZoomRatio = zoomState.getValue().getMinZoomRatio();
-        LogUtils.e(maxZoomRatio);
-        LogUtils.e(minZoomRatio);
 
         mBinding.viewFinder.setCustomTouchListener(new CameraXCustomPreviewView.CustomTouchListener() {
-            @Override
-            public void zoom() {
-                float zoomRatio = zoomState.getValue().getZoomRatio();
-                if (zoomRatio < maxZoomRatio) {
-                    mCameraControl.setZoomRatio((float) (zoomRatio + 0.1));
-                }
-            }
 
             @Override
-            public void ZoomOut() {
-                float zoomRatio = zoomState.getValue().getZoomRatio();
-                if (zoomRatio > minZoomRatio) {
-                    mCameraControl.setZoomRatio((float) (zoomRatio - 0.1));
-                }
+            public void zoom(float delta) {
+                float currentZoomRatio = zoomState.getValue().getZoomRatio();
+                mCameraControl.setZoomRatio(currentZoomRatio * delta);
             }
 
             @Override
             public void click(float x, float y) {
-                // TODO 对焦
-                MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory(1.0f, 1.0f);
+                MeteringPointFactory factory = mBinding.viewFinder.getMeteringPointFactory();
                 MeteringPoint point = factory.createPoint(x, y);
                 FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
                         // auto calling cancelFocusAndMetering in 3 seconds
@@ -268,6 +253,7 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
                             mBinding.focusView.onFocusFailed();
                         }
                     } catch (Exception e) {
+                        LogUtils.e(e);
                     }
                 }, executor);
             }
@@ -275,8 +261,8 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
             @Override
             public void doubleClick(float x, float y) {
                 // 双击放大缩小
-                float zoomRatio = zoomState.getValue().getZoomRatio();
-                if (zoomRatio > minZoomRatio) {
+                float currentZoomRatio = zoomState.getValue().getZoomRatio();
+                if (currentZoomRatio > zoomState.getValue().getMinZoomRatio()) {
                     mCameraControl.setLinearZoom(0f);
                 } else {
                     mCameraControl.setLinearZoom(0.5f);
@@ -296,6 +282,7 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
     private void initUseCases() {
         initImageAnalysis();
         initImageCapture();
+        // 视频：VideoCapture
         initPreview();
         initCameraSelector();
     }
@@ -331,7 +318,7 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
                 PlanarYUVLuminanceSource source = new PlanarYUVLuminanceSource(data, image.getWidth(), image.getHeight(), 0, 0, image.getWidth(), image.getHeight(), false);
                 BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
                 try {
-                    Result result = QrBarTool.getDefaultMultiFormatReader().decode(binaryBitmap);
+                    Result result = DecodeCodeTools.getDefaultMultiFormatReader().decode(binaryBitmap);
                     if (result != null && (StringUtils.isEmpty(mQrText) || !StringUtils.equals(mQrText, result.getText()))) {
                         mQrText = result.getText();
                         LogUtils.e(result.toString());
@@ -402,6 +389,18 @@ public class CameraXDemoActivity extends BaseActivity<ActivityCameraxDemoBinding
         mCameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(mCameraSelectorInt)
                 .build();
+    }
+
+    private void changeCameraConfig(int changeType) {
+        if (changeType == CHANGE_TYPE_RATIO) {
+            if (mCameraProvider.isBound(mImageCapture)) {
+                mCameraProvider.unbind(mImageCapture);
+            }
+            initImageCapture();
+            mCameraProvider.bindToLifecycle(this, mCameraSelector, mImageCapture);
+        } else if (changeType == CHANGE_TYPE_SELECTOR) {
+            initCamera();
+        }
     }
 
     @NonNull

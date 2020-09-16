@@ -4,6 +4,7 @@
 
 * [注意事项](#注意事项)
 * [导入指南](#导入指南)
+* [目录介绍](#目录介绍)
 * [相关文档](#相关文档)
 * [混淆](#混淆)
 * [其他](#其他)
@@ -94,7 +95,14 @@
     }
     ```
 
-2. 请将[支付宝的aar文件](/libs)放入您项目根目录的`libs`目录中（没有可以新建，文件名字不要变，文件夹名字跟上面的名字匹配起来就可以）
+2. 请将[支付宝的aar文件](/libs)放入您项目根目录的`libs`目录中，然后在启动模块（ex：app Module）添加支付宝aar依赖
+
+    ``` gradle
+    dependencies {
+        // ...
+        api (name: 'alipaySdk-15.7.7-20200702160044', ext: 'aar')
+    }
+    ```
 
 ## 如何使用Mvc、Mvp、Mvvm模式
 
@@ -106,7 +114,7 @@
 # 导入指南
 
 ``` groovy
-def quicklib = "4.1.0"
+def quicklib = "4.5.0"
 
 // quicklib(Base)
 implementation "com.sdwfqin.quicklib:quicklib:$quicklib"
@@ -120,6 +128,21 @@ implementation "com.sdwfqin.quicklib:imageloader:$quicklib"
 implementation "com.sdwfqin.quicklib:widget:$quicklib"
 ```
 
+# 目录介绍
+
+| 目录文件 | 解释 |
+| :-------- | :--------|
+| app | Demo(Java版) |
+| app-kt | MVVM+Hilt+Retrofit+协程 |
+| sampleCommonLibrary | Demo公共组件 |
+| ~~docs~~ | ~~文档~~ |
+| imageloader | 图片加载库（基于Glide） |
+| libs | 公共jar/aar包 |
+| paylib | 支付组件库 |
+| quicklib | 基础组件库 |
+| widget | View组件库 |
+| config.gradle | 依赖配置 |
+
 # 相关文档
 
 [1.x文档](/docs/README_1_x.md)
@@ -130,7 +153,7 @@ implementation "com.sdwfqin.quicklib:widget:$quicklib"
 
 # 混淆
 
-可参考[Sample混淆文件](/app/proguard-rules.pro)
+4.2.0开始支持自动传递混淆配置，如有问题请提Issues或单独添加需要添加的策略～
 
 # 其他
 
@@ -158,8 +181,9 @@ implementation "com.sdwfqin.quicklib:widget:$quicklib"
 | GsonUtil | Gson工具类 |
 | RxSchedulersUtils | compose()统一线程处理 |
 | RxTimerUtil | RxJava定时任务 |
+| RxJavaLifecycleManager | RxJava生命周期管理 |
 | EventBusUtil | EventBus工具类，使用时需要配合Base基类 |
-| HintDialog | 可配置提示弹窗 |
+| QuickSimpleHintDialog | 可配置提示弹窗 |
 | AppManager | Activity栈管理 |
 | QuickExecutor | 线程池 |
 | ImageWatermarkUtils | 图片水印工具类 |

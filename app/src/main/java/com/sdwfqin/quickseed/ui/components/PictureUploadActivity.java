@@ -4,16 +4,17 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.sdwfqin.quickseed.base.ArouterConstants;
-import com.sdwfqin.quickseed.base.SampleBaseActivity;
+import com.sdwfqin.quickseed.constants.ArouterConstants;
 import com.sdwfqin.quickseed.databinding.ActivityPictureUploadBinding;
 import com.sdwfqin.quickseed.model.PictureModel;
-import com.sdwfqin.quickseed.utils.picture.PictureSelectUtils;
 import com.sdwfqin.widget.pictureupload.PictureUploadCallback;
 import com.zhihu.matisse.Matisse;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.sdwfqin.samplecommonlibrary.base.SampleBaseActivity;
+import io.github.sdwfqin.samplecommonlibrary.utils.picture.PictureSelectUtils;
 
 /**
  * 描述：九宫格上传图片
@@ -26,8 +27,6 @@ public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUpl
 
     public static final int RESULT_PHOTO_SELECT = 101;
 
-//    PictureUploadView<PictureModel> mPic;
-
     @Override
     protected ActivityPictureUploadBinding getViewBinding() {
         return ActivityPictureUploadBinding.inflate(getLayoutInflater());
@@ -39,9 +38,8 @@ public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUpl
         mTopBar.addLeftBackImageButton()
                 .setOnClickListener(v -> finish());
 
-//        mPic = mBinding.pic;
-
         mBinding.pic.setMaxColumn(3);
+        mBinding.pic.setMaxSize(12);
         mBinding.pic.setPicUploadCallback(new PictureUploadCallback<PictureModel>() {
             @Override
             public void click(int position, PictureModel pictureModel, List<PictureModel> list) {
@@ -49,12 +47,12 @@ public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUpl
             }
 
             @Override
-            public void remove(int position, List list) {
+            public void remove(int position, List<PictureModel> list) {
 
             }
 
             @Override
-            public void onAddPic(int maxPic, List list) {
+            public void onAddPic(int maxPic, List<PictureModel> list) {
                 PictureSelectUtils.SelectSystemPhoto(mContext, RESULT_PHOTO_SELECT, maxPic);
             }
         });
@@ -76,7 +74,7 @@ public class PictureUploadActivity extends SampleBaseActivity<ActivityPictureUpl
                     for (int i = 0; i < selectList.size(); i++) {
                         models.add(new PictureModel(selectList.get(i)));
                     }
-                    mBinding.pic.setAddData(models);
+                    mBinding.pic.addData(models);
 
                     // 刷新相册图片
                     if (selectList.size() == 1) {
